@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 248 250 252;
+  --surface: 255 255 255;
+  --ink: 13 25 48;
+  --muted: 82 98 128;
+  --line: 221 229 241;
+  --sky: 96 178 240;
+  --blue: 31 95 191;
+  --emerald: 22 150 115;
+  --gold: 201 162 75;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: 8 16 31;
+  --surface: 16 28 52;
+  --ink: 232 238 248;
+  --muted: 150 166 196;
+  --line: 34 52 86;
+  --sky: 124 196 248;
+  --blue: 96 156 240;
+  --emerald: 61 199 156;
+  --gold: 214 180 100;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(
+      48rem 30rem at 92% -6%,
+      rgb(var(--sky) / 0.22),
+      transparent 65%
+    ),
+    radial-gradient(
+      40rem 26rem at -6% 22%,
+      rgb(var(--emerald) / 0.12),
+      transparent 65%
+    );
+  background-repeat: no-repeat;
+}
+:focus-visible {
+  outline: 3px solid rgb(var(--gold));
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0;
+  }
+  .btn-primary {
+    @apply bg-blue text-white shadow-soft hover:-translate-y-0.5 hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply border border-line bg-surface/70 text-ink backdrop-blur hover:-translate-y-0.5 hover:border-blue;
+  }
+  .card {
+    @apply rounded-3xl border border-line bg-surface/80 p-6 shadow-sm backdrop-blur;
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:border-blue/60 hover:shadow-soft;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full border border-line bg-surface/60 px-2.5 py-0.5 text-xs font-medium text-muted;
+  }
+  .h-display {
+    @apply font-extrabold tracking-tight;
+    font-size: clamp(2.3rem, 5.4vw, 4rem);
+    line-height: 1.05;
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue via-sky to-emerald bg-clip-text text-transparent;
+  }
+  .arch {
+    border-radius: 999px 999px 2rem 2rem;
+  }
+  .pattern {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cpath d='M45 5l9 24 24-9-9 24 24 9-24 9 9 24-24-9-9 24-9-24-24 9 9-24-24-9 24-9-9-24 24 9z' fill='none' stroke='%238899bb' stroke-opacity='.22'/%3E%3C/svg%3E");
+  }
+  @layer utilities {
+    .shadow-soft {
+      box-shadow: 0 12px 40px -14px rgb(var(--blue) / 0.35);
+    }
+    .shadow-glow {
+      box-shadow: 0 0 90px -12px rgb(var(--sky) / 0.55);
+    }
+  }
+}
