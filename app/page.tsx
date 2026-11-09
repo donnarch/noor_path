@@ -4,16 +4,18 @@ import { Welcome } from "@/components/home/Welcome";
 import { Dashboard } from "@/components/home/Dashboard";
 
 const AREAS: { t: string; d: string; ar: string; href?: string }[] = [
-  { t: "Learn", d: "Wudu and prayer, step by step", ar: "علم", href: "/learn" },
+  { t: "Learn", d: "Wudu, prayer, pillars, Ramadan, Hajj and more", ar: "علم", href: "/learn" },
   { t: "Salah Vision", d: "Camera practice with a live skeleton", ar: "رؤية", href: "/salah-vision" },
-  { t: "My progress", d: "Your lessons, backup and data", ar: "تقدم", href: "/progress" },
-  { t: "Privacy", d: "What is stored and where", ar: "خصوصية", href: "/privacy" },
+  { t: "Arabic Studio", d: "Letters, their forms, vowel marks and a quiz", ar: "حروف", href: "/arabic" },
+  { t: "Prayer times", d: "For your city, with a countdown", ar: "مواقيت", href: "/tools" },
+  { t: "Qibla", d: "Direction of the Kaaba, with a compass", ar: "قبلة", href: "/tools" },
+  { t: "Tasbih", d: "A saved dhikr counter", ar: "تسبيح", href: "/tools" },
+  { t: "Zakat calculator", d: "An educational estimate", ar: "زكاة", href: "/tools" },
+  { t: "Islamic calendar", d: "Hijri date and coming events", ar: "تقويم", href: "/tools" },
+  { t: "Donate", d: "Trusted links to give to those in need", ar: "تبرع", href: "/donate" },
   { t: "Quran", d: "Reader, audio and memorization", ar: "قرآن" },
-  { t: "Arabic Studio", d: "Letters, vowels and pronunciation", ar: "حروف" },
   { t: "Dua Library", d: "Verified daily supplications", ar: "دعاء" },
-  { t: "Prayer times", d: "For your location", ar: "مواقيت" },
-  { t: "Qibla", d: "Direction of the Kaaba", ar: "قبلة" },
-  { t: "Tasbih", d: "A saved dhikr counter", ar: "تسبيح" },
+  { t: "My progress", d: "Your lessons, backup and data", ar: "تقدم", href: "/progress" },
 ];
 const TRUST = ["No account needed", "Camera stays on your device", "Content marked until reviewed"];
 
@@ -61,7 +63,7 @@ export default function Home() {
 
       <section className="mt-24" aria-labelledby="qa">
         <h2 id="qa" className="text-3xl font-extrabold tracking-tight">Everything in Noor Path</h2>
-        <p className="mt-2 text-muted">Items marked “Planned” are not available yet.</p>
+        <p className="mt-2 text-muted">The Quran and the Dua Library are planned. They need verified text from official sources, so we are not adding them until that is done properly.</p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {AREAS.map((a) => {
             const inner = (
@@ -78,6 +80,12 @@ export default function Home() {
               : <div key={a.t} className="card opacity-60" aria-disabled="true">{inner}</div>;
           })}
         </div>
+      </section>
+
+      <section className="mt-24 rounded-[2rem] border border-gold/50 bg-gold/10 p-8 text-center sm:p-12" aria-labelledby="help">
+        <h2 id="help" className="text-2xl font-extrabold tracking-tight">Want to help people in need?</h2>
+        <p className="mx-auto mt-3 max-w-xl text-muted">Noor Path never collects donations. We share links to organisations where you can give directly.</p>
+        <Link href="/donate" className="btn btn-primary mt-6">See donation links</Link>
       </section>
     </div>
   );

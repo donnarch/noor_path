@@ -1,11 +1,17 @@
 import { DEFAULT_CONFIG, type Config } from "./config";
 import { extractFeatures } from "./features";
 import { classify, evaluate } from "./rules";
-import type { Frame, Issue, Landmark, Moment, Position, Summary } from "./types";
+import type { Features, Frame, Issue, Landmark, Moment, Position, Status, Summary } from "./types";
 
 export { DEFAULT_CONFIG };
 
 interface Segment { position: Position; start: number; end?: number }
+
+function gapNote(f: Features, c: Config): string {
+  if (f.hipHeight >= c.family.minUprightHip && f.torso > c.standing.maxTorso && f.torso < c.ruku.minTorso)
+    return "You are bending part of the way. Bend until your back is level for ruku, or stand upright.";
+  return "This doesn’t match a prayer position I know. You may be moving between positions, or the camera may not see your side.";
+}
 
 /** Stateful analyzer: smooths landmarks, confirms positions over time and emits reviewable moments. */
 export class SalahAnalyzer {
@@ -15,6 +21,7 @@ export class SalahAnalyzer {
   private confirmed: Position | null = null;
   private pending: Position | null = null;
   private pendingSince = 0;
+  private unknownSince: number | null = null;
   private segments: Segment[] = [];
   private since = new Map<string, number>();
   private lastFired = new Map<string, number>();
@@ -25,7 +32,7 @@ export class SalahAnalyzer {
   constructor(cfg: Config = DEFAULT_CONFIG) { this.cfg = cfg; }
 
   reset() {
-    this.smooth = null; this.votes = []; this.confirmed = null; this.pending = null;
+    this.smooth = null; this.votes = []; this.confirmed = null; this.pending = null; this.unknownSince = null;
     this.segments = []; this.since.clear(); this.lastFired.clear(); this.total = 0; this.reliableFrames = 0; this.momentCount = 0;
   }
 
@@ -43,8 +50,10 @@ export class SalahAnalyzer {
     this.total++;
     const sm = lm ? this.smoothed(lm) : null;
     const { features, warnings } = extractFeatures(sm, this.cfg);
-    const empty: Frame = { reliable: false, warnings, position: this.confirmed, candidate: null, features: null, issues: [], moments: [], smoothed: sm };
-    if (!features) { this.since.clear(); return empty; }
+    if (!features) {
+      this.since.clear(); this.unknownSince = null;
+      return { reliable: false, status: "unreliable", note: "", warnings, position: this.confirmed, candidate: null, features: null, issues: [], moments: [], smoothed: sm };
+    }
     this.reliableFrames++;
 
     const candidate = classify(features, this.cfg);
@@ -66,6 +75,9 @@ export class SalahAnalyzer {
       }
     } else this.pending = null;
 
+    if (candidate === null) { if (this.unknownSince === null) this.unknownSince = t; } else this.unknownSince = null;
+    const unknownLong = this.unknownSince !== null && t - this.unknownSince >= s.unknownMs;
+
     const issues: Issue[] = [], moments: Moment[] = [];
     if (this.confirmed && candidate === this.confirmed) {
       const now = evaluate(this.confirmed, features, this.cfg);
@@ -82,7 +94,12 @@ export class SalahAnalyzer {
       }
     } else this.since.clear();
 
-    return { reliable: true, warnings: [], position: this.confirmed, candidate, features, issues, moments, smoothed: sm };
+    let status: Status, note = "";
+    if (issues.length) status = "issue";
+    else if (unknownLong) { status = "unknown"; note = gapNote(features, this.cfg); }
+    else status = this.confirmed ? "good" : "unknown";
+
+    return { reliable: true, status, note, warnings: [], position: this.confirmed, candidate, features, issues, moments, smoothed: sm };
   }
 
   getSummary(endT: number): Summary {
